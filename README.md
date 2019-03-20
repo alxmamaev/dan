@@ -1,6 +1,6 @@
 # DAN
 Deep Averaging Networks<br>
-[(Paper)[https://people.cs.umass.edu/~miyyer/pubs/2015_acl_dan.pdf]]
+[[Paper](https://people.cs.umass.edu/~miyyer/pubs/2015_acl_dan.pdf)]
 
 
 ## Example
