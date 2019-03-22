@@ -14,6 +14,7 @@ class DAN(nn.Module):
 
     def forward(self, X):
         mask = self.bernoulli.sample(X.shape).float().unsqueeze(2)
+        mask = mask.to(X.device)
 
         out = self.emb(X)
         out = out * mask
