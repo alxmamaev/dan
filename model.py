@@ -1,27 +1,36 @@
 import torch
 from torch import nn
-from torch import nn
 from torch.distributions.bernoulli import Bernoulli
 
 class DAN(nn.Module):
     def __init__(self, vocab_size, vector_size,
-                hidden_size, output_size, dropout=0.3):
+                hidden_size, output_size,
+                token_drop_rate=0.3, dropout=0.1):
         super().__init__()
         self.bernoulli = Bernoulli(dropout)
         self.emb = nn.Embedding(vocab_size, vector_size)
-        self.fc1 = nn.Linear(vector_size, hidden_size)
-        self.fc2 = nn.Linear(hidden_size, output_size)
+
+        self.enc = nn.Sequential(nn.BatchNorm1d(vector_size),
+                                 nn.Linear(vector_size, hidden_size),
+                                 nn.BatchNorm1d(hidden_size),
+                                 nn.Dropout(p=dropout),
+                                 nn.Sigmoid(),
+                                 nn.Linear(hidden_size, output_size),
+                                 nn.BatchNorm1d(output_size))
 
     def forward(self, X):
-        mask = self.bernoulli.sample(X.shape).float().unsqueeze(2)
-        mask = mask.to(X.device)
+
+        # Masking
+        with torch.no_grad():
+            if self.training:
+                mask = self.bernoulli.sample(X.shape).byte()
+                mask = mask.to(X.device)
+
+                X[mask] = 0
+            n_tokens = (X == 0).sum()
 
         out = self.emb(X)
-        out = out * mask
-        out = out.sum(dim=1)
-        out = out/(mask.sum(dim=1))
-
-        out = self.fc1(out)
-        out = self.fc2(out)
+        out = out.sum(dim=1) / n_tokens
+        out = self.enc(out)
 
         return out
