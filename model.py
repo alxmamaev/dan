@@ -19,7 +19,7 @@ class DAN(nn.Module):
                                  nn.BatchNorm1d(output_size))
 
     def forward(self, X):
-
+        import pdb;pdb.set_trace()
         # Masking
         with torch.no_grad():
             if self.training:
@@ -27,7 +27,7 @@ class DAN(nn.Module):
                 mask = mask.to(X.device)
 
                 X[mask] = 0
-            n_tokens = (X == 0).sum()
+            n_tokens = (X != 0).sum()
 
         out = self.emb(X)
         out = out.sum(dim=1) / n_tokens
