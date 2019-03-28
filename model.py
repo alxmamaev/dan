@@ -19,7 +19,6 @@ class DAN(nn.Module):
                                  nn.BatchNorm1d(output_size))
 
     def forward(self, X):
-        import pdb;pdb.set_trace()
         # Masking
         with torch.no_grad():
             if self.training:
