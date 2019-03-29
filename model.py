@@ -14,25 +14,13 @@ class DAN(nn.Module):
                                  nn.Linear(vector_size, hidden_size),
                                  nn.BatchNorm1d(hidden_size),
                                  nn.Dropout(p=dropout),
-                                 nn.Sigmoid(),
+                                 nn.ReLU(),
                                  nn.Linear(hidden_size, output_size),
                                  nn.BatchNorm1d(output_size))
 
     def forward(self, X):
-        # Masking
-        with torch.no_grad():
-            if self.training:
-                mask = self.bernoulli.sample(X.shape).byte()
-                mask = mask.to(X.device)
-
-                X[mask] = 0
-                emb_mask = mask.float().unsqueeze(2).to(X.device)
-            else:
-                emb_mask = torch.ones(X.shape).unsqueeze(2).to(X.device)
-            n_tokens = (X != 0).sum(dim=1).float().unsqueeze(1).to(X.device)
-
-        out = self.emb(X) * emb_mask
-        out = out.sum(dim=1) / n_tokens
+        out = self.emb(X)
+        out = out.mean(dim=1)
         out = self.enc(out)
 
         return out
