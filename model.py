@@ -26,9 +26,12 @@ class DAN(nn.Module):
                 mask = mask.to(X.device)
 
                 X[mask] = 0
-            n_tokens = (X != 0).sum()
+                emb_mask = mask.float().unsqueeze(2).to(X.device)
+            else:
+                emb_mask = torch.ones(X.shape).unsqueeze(2).to(X.device)
+            n_tokens = (X != 0).sum(dim=1)
 
-        out = self.emb(X)
+        out = self.emb(X) * emb_mask
         out = out.sum(dim=1) / n_tokens
         out = self.enc(out)
 
