@@ -10,8 +10,7 @@ class DAN(nn.Module):
         self.bernoulli = Bernoulli(dropout)
         self.emb = nn.Embedding(vocab_size, vector_size)
 
-        self.enc = nn.Sequential(nn.BatchNorm1d(vector_size),
-                                 nn.Linear(vector_size, hidden_size),
+        self.enc = nn.Sequential(nn.Linear(vector_size, hidden_size),
                                  nn.BatchNorm1d(hidden_size),
                                  nn.Dropout(p=dropout),
                                  nn.ReLU(),
