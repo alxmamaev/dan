@@ -20,9 +20,10 @@ class DAN(nn.Module):
 
     def forward(self, X, idf=None):
         if idf is not None:
+            with torch.no_grad():
+                idf = idf / idf.sum(1)
             out = self.emb(X) * idf.unsqueeze(2)
             out = out.sum(dim=1)
-            out = out / idf.sum(1).unsqueeze(1)
             out = self.enc(out)
         else:
             out = self.emb(X)
