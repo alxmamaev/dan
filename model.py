@@ -18,9 +18,15 @@ class DAN(nn.Module):
                                  nn.Linear(hidden_size, output_size),
                                  nn.BatchNorm1d(output_size))
 
-    def forward(self, X):
-        out = self.emb(X)
-        out = out.mean(dim=1)
-        out = self.enc(out)
+    def forward(self, X, idf=None):
+        if idf is not None:
+            out = self.emb(X) * idf.unsqueeze(2)
+            out = out.sum(dim=1)
+            out = out / idf.sum(1)
+            out = self.enc(out)
+        else:
+            out = self.emb(X)
+            out = out.mean(dim=1)
+            out = self.enc(out)
 
         return out
