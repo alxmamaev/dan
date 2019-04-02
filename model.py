@@ -4,8 +4,7 @@ from torch.distributions.bernoulli import Bernoulli
 
 class DAN(nn.Module):
     def __init__(self, vocab_size, vector_size,
-                hidden_size, output_size,
-                token_drop_rate=0.3, dropout=0.1):
+                hidden_size, output_size, dropout=0.1):
         super().__init__()
         self.bernoulli = Bernoulli(dropout)
         self.emb = nn.Embedding(vocab_size, vector_size)
@@ -17,16 +16,9 @@ class DAN(nn.Module):
                                  nn.Linear(hidden_size, output_size),
                                  nn.BatchNorm1d(output_size))
 
-    def forward(self, X, idf=None):
-        if idf is not None:
-            with torch.no_grad():
-                idf = idf / idf.sum(1).unsqueeze(1)
-            out = self.emb(X) * idf.unsqueeze(2)
-            out = out.sum(dim=1)
-            out = self.enc(out)
-        else:
-            out = self.emb(X)
-            out = out.mean(dim=1)
-            out = self.enc(out)
+    def forward(self, X):
+        out = self.emb(X)
+        out = out.mean(dim=1)
+        out = self.enc(out)
 
         return out
