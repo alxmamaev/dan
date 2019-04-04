@@ -12,7 +12,8 @@ class DAN(nn.Module):
                                  nn.LayerNorm(hidden_size),
                                  nn.Dropout(p=dropout),
                                  nn.ReLU(),
-                                 nn.Linear(hidden_size, output_size))
+                                 nn.Linear(hidden_size, output_size),
+                                 nn.LayerNorm(output_size))
 
     def forward(self, X):
         out = self.emb(X)
